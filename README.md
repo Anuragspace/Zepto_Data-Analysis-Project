@@ -4,6 +4,8 @@
 
 This end-to-end Data Analyst portfolio project demonstrates how real-world e-commerce inventory data is explored, cleaned, and analyzed using **PostgreSQL**. The project is designed to simulate the daily workflow of data analysts working in retail or e-commerce environments. It features hands-on SQL work, from setting up a messy dataset to delivering business insights.
 
+![Zepto Data Analysis Screenshot](https://github.com/user-attachments/assets/e0c0a737-ba99-47c1-927d-a233c6a65e56)
+
 ---
 
 ## 📣 Who Is This Project For?
