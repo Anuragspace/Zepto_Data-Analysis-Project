@@ -2,27 +2,34 @@
 
 ## 🚀 Project Overview
 
-This end-to-end Data Analyst portfolio project demonstrates how real-world e-commerce inventory data is explored, cleaned, and analyzed using **PostgreSQL**. The project is designed to simulate the daily workflow of data analysts working in retail or e-commerce environments. It features hands-on SQL work, from setting up a messy dataset to delivering business insights.
+This project is a comprehensive, hands-on SQL data analysis portfolio piece that replicates the challenges data analysts face in real e-commerce and retail environments. You'll experience the entire data analysis pipeline—from working with messy, real-world inventory data to extracting meaningful business insights using SQL in PostgreSQL. 
+
+Whether you're aiming for a data analyst role, want to showcase your SQL skills for interviews or LinkedIn, or are preparing for analytics positions in retail, product, or e-commerce, this project is designed to make you industry-ready.
 
 ![Zepto Data Analysis Screenshot](https://github.com/user-attachments/assets/e0c0a737-ba99-47c1-927d-a233c6a65e56)
 
 ---
 
-## 📣 Who Is This Project For?
+## 👀 What Is This Project About? (Who Should Use It?)
 
-- **📊 Data Analyst aspirants:** Build a strong SQL portfolio project for interviews and LinkedIn.
-- **📚 SQL learners:** Practice SQL techniques on real-world data.
-- **💼 Interview preparation:** Perfect for roles in retail, e-commerce, or product analytics.
+This project is perfect for anyone who wants to:
+
+- **Gain Real-World Experience:** Work with a realistic, messy e-commerce dataset sourced from Kaggle and Zepto’s official listings.
+- **Showcase SQL & Analytical Skills:** Build a portfolio project that stands out for interviews, LinkedIn profiles, and career advancement.
+- **Prepare for Analytics Roles:** Practice the skills and workflows required in retail, product, and e-commerce analytics positions.
+- **Learn By Doing:** Understand how to clean, explore, and analyze real inventory data, and communicate findings effectively.
+
+You'll learn to simulate the work of a data analyst: set up a database, perform exploratory analysis, clean and transform messy data, and deliver business-driven insights. 
 
 ---
 
 ## 🗂️ Dataset Summary
 
 - **Source:** [Kaggle - Zepto Inventory Dataset](https://www.kaggle.com/datasets/palvinder2006/zepto-inventory-dataset)
-- **Description:** Scraped from Zepto’s official product listings, simulating a real e-commerce inventory system.
-- **Rows:** Each row is a unique SKU (Stock Keeping Unit). Duplicate product names exist due to different packages, sizes, discounts, or categories.
+- **Description:** Scraped from Zepto’s product listings, mimicking a true e-commerce inventory system.
+- **Rows:** Each row is a unique SKU (Stock Keeping Unit). Duplicate product names represent different package sizes, weights, discounts, or categories.
 
-### 🔑 Columns Explained
+### 🔑 Columns
 
 | Column                  | Description                                                            |
 |-------------------------|------------------------------------------------------------------------|
@@ -65,53 +72,17 @@ This end-to-end Data Analyst portfolio project demonstrates how real-world e-com
 
 ---
 
-## 🛠️ Tools Used
-
-- **Database:** PostgreSQL
-- **Language:** SQL
-- **Dataset:** [Kaggle Zepto Inventory](https://www.kaggle.com/datasets/palvinder2006/zepto-inventory-dataset)
-
----
-
 ## 👨‍💻 Example SQL Code Snippets
 
-### Sample 1: Counting Total Records
+Below are SQL queries used to answer key business questions in this project:
 
+### 1. How many unique product categories are in the dataset?
 ```sql
-SELECT COUNT(*) AS total_records
+SELECT COUNT(DISTINCT category) AS unique_categories
 FROM zepto_inventory;
 ```
 
-### Sample 2: Checking Nulls Across Columns
-
-```sql
-SELECT
-    COUNT(*) FILTER (WHERE sku_id IS NULL) AS null_sku_id,
-    COUNT(*) FILTER (WHERE name IS NULL) AS null_name,
-    COUNT(*) FILTER (WHERE category IS NULL) AS null_category,
-    COUNT(*) FILTER (WHERE mrp IS NULL) AS null_mrp,
-    COUNT(*) FILTER (WHERE discountedSellingPrice IS NULL) AS null_discountedSellingPrice
-FROM zepto_inventory;
-```
-
-### Sample 3: Removing Zero Pricing Entries
-
-```sql
-DELETE FROM zepto_inventory
-WHERE mrp = 0 OR discountedSellingPrice = 0;
-```
-
-### Sample 4: Converting Paise to Rupees
-
-```sql
-UPDATE zepto_inventory
-SET
-    mrp = mrp / 100.0,
-    discountedSellingPrice = discountedSellingPrice / 100.0;
-```
-
-### Sample 5: Top 10 Best-Value Products
-
+### 2. What are the top 10 products with the highest discount percentage?
 ```sql
 SELECT name, category, discountPercent
 FROM zepto_inventory
@@ -119,15 +90,94 @@ ORDER BY discountPercent DESC
 LIMIT 10;
 ```
 
+### 3. Which products have an MRP above ₹500 but with less than 5% discount?
+```sql
+SELECT name, mrp, discountPercent
+FROM zepto_inventory
+WHERE mrp > 500 AND discountPercent < 5;
+```
+
+### 4. What is the potential revenue for each product category? 
+```sql
+SELECT category,
+       SUM(discountedSellingPrice * availableQuantity) AS potential_revenue
+FROM zepto_inventory
+GROUP BY category
+ORDER BY potential_revenue DESC;
+```
+
+### 5. Which product categories offer the highest average discounts?
+```sql
+SELECT category,
+       AVG(discountPercent) AS avg_discount
+FROM zepto_inventory
+GROUP BY category
+ORDER BY avg_discount DESC
+LIMIT 5;
+```
+
+### 6. What is the total inventory weight by product category?
+```sql
+SELECT category,
+       SUM(weightInGms * availableQuantity) AS total_inventory_weight
+FROM zepto_inventory
+GROUP BY category
+ORDER BY total_inventory_weight DESC;
+```
+
+### 7. Which products are currently out of stock but have a high MRP?
+```sql
+SELECT name, mrp
+FROM zepto_inventory
+WHERE outOfStock = TRUE AND mrp > 300
+ORDER BY mrp DESC;
+```
+
+### 8. Calculate price per gram for all products to find best value-for-money items
+```sql
+SELECT name, discountedSellingPrice / NULLIF(weightInGms, 0) AS price_per_gram
+FROM zepto_inventory
+ORDER BY price_per_gram ASC
+LIMIT 10;
+```
+
+### 9. Group products by weight: Low (<250g), Medium (250-1000g), Bulk (>1000g)
+```sql
+SELECT name, 
+       CASE 
+           WHEN weightInGms < 250 THEN 'Low'
+           WHEN weightInGms BETWEEN 250 AND 1000 THEN 'Medium'
+           ELSE 'Bulk'
+       END AS weight_group
+FROM zepto_inventory;
+```
+
+### 10. How many products are present multiple times (duplicate names)?
+```sql
+SELECT name, COUNT(*) AS sku_count
+FROM zepto_inventory
+GROUP BY name
+HAVING COUNT(*) > 1
+ORDER BY sku_count DESC;
+```
+
 ---
 
-## 📊 Key Insights Delivered
+## 💡 What I Learned
 
-- **Category Analysis:** Identified top categories with highest sales potential and discounts.
-- **Stock Analysis:** Flagged products out of stock with high revenue potential.
-- **Value Analysis:** Ranked products by price per gram and overall value for money.
-- **Inventory Management:** Segmented inventory by weight and measured total stock per category.
-- **Business Recommendations:** Provided actionable insights for improving pricing, stock, and category management.
+- **Real-World Data Challenges:** Gained hands-on experience handling inconsistent, messy, and duplicate data typical in e-commerce.
+- **SQL Mastery:** Improved proficiency in writing complex SQL queries for EDA, cleaning, and business analysis.
+- **Business Acumen:** Learned how to translate data findings into actionable business insights for inventory, pricing, and category management.
+- **Portfolio Building:** Produced a project that demonstrates both technical and analytical skills, perfect for interviews and professional profiles.
+- **Communication:** Practiced clear documentation and storytelling for communicating analytical projects.
+
+---
+
+## 🛠️ Tools Used
+
+- **Database:** PostgreSQL
+- **Language:** SQL
+- **Dataset:** [Kaggle Zepto Inventory](https://www.kaggle.com/datasets/palvinder2006/zepto-inventory-dataset)
 
 ---
 
@@ -147,19 +197,10 @@ LIMIT 10;
 
 ---
 
-## 💡 What You’ll Learn
-
-- Real-world SQL data cleaning and analysis
-- EDA workflows for e-commerce datasets
-- Insight generation for business decision-making
-- Portfolio-ready documentation and code samples
-
----
-
 ## 📬 Contact & Feedback
 
 If you have questions, feedback, or want to connect, feel free to reach out via [LinkedIn](#) or open an issue in this repository!
 
 ---
 
-> **This project is perfect for showcasing your SQL skills and understanding of e-commerce data analysis. Clone, fork or use it as a template for your own portfolio!**
+> **This project is ideal for demonstrating your SQL and analytics skills with real e-commerce data. Fork, clone, or use it as a template for your own portfolio!**
